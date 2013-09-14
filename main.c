@@ -51,7 +51,7 @@ void generateList() {
             sk[i][0] = sk[i-1][TOTAL_LEVEL-1];
         for(int j = 0; j+1 < TOTAL_LEVEL; j++) {
             sk[i][j+1] = sk[i][j] + ceil(pow(2, i+2) * 25.0 * pow(100.0, j/100.0));
-            printf("%d, %03d %d %d\n", i, j+1, sk[i][j+1], sk[i][j+1] - sk[i][j]);
+//            printf("%d, %03d %d %d\n", i, j+1, sk[i][j+1], sk[i][j+1] - sk[i][j]);
         }
     }
 }
@@ -83,9 +83,7 @@ int main(int argc, char ** argv){
         return 0;
     }
 
-    printf("generating list\n");
     generateList();
-    printf("get exp\n");
     currentExp = getExp(skillclass, skilllevel);
     printf("current exp %d\n", currentExp);
     if(skillclass == 0) {
