@@ -66,6 +66,19 @@ int getExp(int skclass, int level) {
     return rtn;
 }
 
+void formatOutput(int skclass, int sklevel, int afterclass, int afterlevel, int currentExp, int afterExp, int isPaid) {
+    if(isPaid)
+        printf("Paid: From ");
+    else
+        printf("Free: From ");
+    if(skclass == 0) {
+        printf("Major class %d to Major class %d, Exp lost = %d\n", sklevel, afterlevel, currentExp - afterExp);
+    }
+    else {
+        printf("Perk/Skill %d, %d%% to Perk/Skill %d, %d%%, Exp lost = %d\n", skclass, sklevel, afterclass, afterlevel, currentExp - afterExp);
+    }
+}
+
 int main(int argc, char ** argv){
     int rtnClass, rtnLevel;
     int currentExp, afterExp;
@@ -85,24 +98,24 @@ int main(int argc, char ** argv){
 
     generateList();
     currentExp = getExp(skillclass, skilllevel);
-    printf("current exp %d\n", currentExp);
+    printf("Current exp %d\n", currentExp);
     if(skillclass == 0) {
         afterExp = currentExp * 0.75;
         whichlevel(afterExp, 1, &rtnLevel, &rtnClass);
-        printf("From class %d, %d%% to %d, %d%%\n", skillclass, skilllevel, rtnClass, rtnLevel);
+        formatOutput(skillclass, skilllevel, rtnClass, rtnLevel, currentExp, afterExp, 1);
 
         afterExp = currentExp * 0.5;
         whichlevel(afterExp, 1, &rtnLevel, &rtnClass);
-        printf("From class %d, %d%% to %d, %d%%\n", skillclass, skilllevel, rtnClass, rtnLevel);
+        formatOutput(skillclass, skilllevel, rtnClass, rtnLevel, currentExp, afterExp, 0);
     }
     else {
         afterExp = currentExp * 0.9;
         whichlevel(afterExp, 0, &rtnLevel, &rtnClass);
-        printf("From class %d, %d%% to %d, %d%% exp lost= %d\n", skillclass, skilllevel, rtnClass, rtnLevel, currentExp - afterExp);
+        formatOutput(skillclass, skilllevel, rtnClass, rtnLevel, currentExp, afterExp, 1);
 
         afterExp = currentExp * 0.8;
         whichlevel(afterExp, 0, &rtnLevel, &rtnClass);
-        printf("From class %d, %d%% to %d, %d%% exp lost = %d\n", skillclass, skilllevel, rtnClass, rtnLevel, currentExp - afterExp);
+        formatOutput(skillclass, skilllevel, rtnClass, rtnLevel, currentExp, afterExp, 0);
     }
     return 0;
 }
