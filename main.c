@@ -4,11 +4,6 @@
 
 #include "exp.h"
 
-int skillclass = 0;
-int skilllevel = 0;
-int paid = 0;
-
-
 void usage(){
     printf("wrong input, wotexp #skillclass #level\n");
 }
@@ -68,20 +63,112 @@ int getExp(int skclass, int level) {
 
 void formatOutput(int skclass, int sklevel, int afterclass, int afterlevel, int currentExp, int afterExp, int isPaid) {
     if(isPaid)
-        printf("Paid: From ");
+        printf("Paid: \nFrom ");
     else
-        printf("Free: From ");
+        printf("Free: \nFrom ");
     if(skclass == 0) {
-        printf("Major class %d to Major class %d, Exp lost = %d\n", sklevel, afterlevel, currentExp - afterExp);
+        printf("Major class %3d\n", sklevel);
+        printf("To   Major class %3d, Exp lost = %d\n", afterlevel, currentExp - afterExp);
     }
     else {
-        printf("Perk/Skill %d, %d%% to Perk/Skill %d, %d%%, Exp lost = %d\n", skclass, sklevel, afterclass, afterlevel, currentExp - afterExp);
+        printf("Perk/Skill %d, %3d%%\n", skclass, sklevel);
+        printf("To   Perk/Skill %d, %3d%%, Exp lost = %d\n", afterclass, afterlevel, currentExp - afterExp);
     }
 }
 
+void showNextStep(int skclass, int sklevel, int currentExp) {
+    int toNextLevel = 0;
+    if(skclass == 0) {
+        if(sklevel == 100)
+            toNextLevel = sk[0][1];
+        else
+            toNextLevel = mainsk[sklevel+1] - currentExp;
+    }
+    else if(skclass < 6){
+        if(sklevel == 100){
+            if(skclass < 4){
+                toNextLevel = sk[skclass][1] - currentExp;
+            }
+            else{
+                printf("Exp to next level unknown!\n");
+            }
+        }
+        else
+            toNextLevel = sk[skclass-1][sklevel+1] - currentExp;
+    }
+    else {
+        printf("Exp to next level unknown!\n");
+    }
+    printf("To next level, you need %d exp.\n", toNextLevel);
+}
+
+void showTargetStep(int skclass, int sklevel, int currentExp, int targetclass, int targetlevel) {
+    int requiredExp = 0;
+    if(skclass > 4 || sklevel > 100 || targetclass > 4 || targetlevel > 100 ||
+            (skclass == targetclass && sklevel > targetlevel) ) {
+        printf("Wrong input!!\n");
+        return;
+    }
+    if(skclass == targetclass){
+        if(skclass == 0) {
+            requiredExp = mainsk[targetlevel] - mainsk[sklevel];
+        }
+        else {
+            requiredExp = sk[skclass -1][targetlevel] - sk[skclass -1][sklevel]; 
+        }
+    }
+    else {
+        if(skclass == 0) {
+            requiredExp =  mainsk[100] - currentExp;
+            currentExp = 0;
+        }
+        requiredExp += sk[targetclass-1][targetlevel] - currentExp;
+    }
+    if(targetclass == 0)
+        printf("To Master %d%%, you need %d exp.\n", targetlevel, requiredExp);
+    else
+        printf("To %d skill %d%%, you need %d exp.\n", targetclass, targetlevel, requiredExp);
+
+}
+int max(int a, int b){
+    return a > b ? a:b;
+}
+void showRetrainMaster(int skclass, int sklevel, int currentExp, int isSameClass) {
+    int rtnClass, rtnLevel, afterExp;
+    rtnClass = skclass;
+    if(isSameClass)
+        rtnLevel = max(sklevel * 0.9, 75);
+    else
+        rtnLevel = max(sklevel * 0.8, 75);
+    afterExp = getExp(rtnClass, rtnLevel);
+    formatOutput(skclass, sklevel, rtnClass, rtnLevel, currentExp, afterExp, 1);
+
+    if(isSameClass)
+        rtnLevel = max(sklevel * 0.8, 50);
+    else
+        rtnLevel = max(sklevel * 0.6, 50);
+    afterExp = getExp(rtnClass, rtnLevel);
+    formatOutput(skclass, sklevel, rtnClass, rtnLevel, currentExp, afterExp, 0);
+}
+
+void showRetrainSkill(int skclass, int sklevel, int currentExp) {
+    int rtnClass, rtnLevel, afterExp;
+    afterExp = currentExp * 0.9;
+    whichlevel(afterExp, 0, &rtnLevel, &rtnClass);
+    formatOutput(skclass, sklevel, rtnClass, rtnLevel, currentExp, afterExp, 1);
+
+    afterExp = currentExp * 0.8;
+    whichlevel(afterExp, 0, &rtnLevel, &rtnClass);
+    formatOutput(skclass, sklevel, rtnClass, rtnLevel, currentExp, afterExp, 0);
+}
+
 int main(int argc, char ** argv){
-    int rtnClass, rtnLevel;
-    int currentExp, afterExp;
+    int skillclass = 0;
+    int skilllevel = 0;
+    int currentExp;
+    int targetclass = 0;
+    int targetlevel = 0;
+    int hasTarget = 0;
     if(argc < 3) {
         usage();
         return 0;
@@ -95,27 +182,26 @@ int main(int argc, char ** argv){
         usage();
         return 0;
     }
+    if(argc == 5) {
+        if(sscanf(argv[3], "%d", &targetclass) && 
+           sscanf(argv[4], "%d", &targetlevel)) {
+            hasTarget = 1;
+        }
+        
+    }
 
     generateList();
     currentExp = getExp(skillclass, skilllevel);
     printf("Current exp %d\n", currentExp);
+    showNextStep(skillclass, skilllevel, currentExp);
     if(skillclass == 0) {
-        afterExp = currentExp * 0.75;
-        whichlevel(afterExp, 1, &rtnLevel, &rtnClass);
-        formatOutput(skillclass, skilllevel, rtnClass, rtnLevel, currentExp, afterExp, 1);
-
-        afterExp = currentExp * 0.5;
-        whichlevel(afterExp, 1, &rtnLevel, &rtnClass);
-        formatOutput(skillclass, skilllevel, rtnClass, rtnLevel, currentExp, afterExp, 0);
+        showRetrainMaster(skillclass, skilllevel, currentExp, 1);
+        showRetrainMaster(skillclass, skilllevel, currentExp, 0);
     }
     else {
-        afterExp = currentExp * 0.9;
-        whichlevel(afterExp, 0, &rtnLevel, &rtnClass);
-        formatOutput(skillclass, skilllevel, rtnClass, rtnLevel, currentExp, afterExp, 1);
-
-        afterExp = currentExp * 0.8;
-        whichlevel(afterExp, 0, &rtnLevel, &rtnClass);
-        formatOutput(skillclass, skilllevel, rtnClass, rtnLevel, currentExp, afterExp, 0);
+        showRetrainSkill(skillclass, skilllevel, currentExp);
     }
+    if(hasTarget)
+        showTargetStep(skillclass, skilllevel, currentExp, targetclass, targetlevel);
     return 0;
 }
