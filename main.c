@@ -8,6 +8,24 @@ void usage(){
     printf("wrong input, wotexp #skillclass #level\n");
 }
 
+void printfGroupThousand(int number) {
+	if(number == 0){
+		printf("0");
+		return;
+	}
+	if(number < 0){
+		number = number * -1;
+		printf("-");
+	}
+	if(number / 1000 > 0) {
+		printfGroupThousand(number / 1000);
+		printf(",");
+		printf("%03d", number % 1000);
+	}
+	else{
+		printf("%d", number);
+	}
+}
 int whichlevel(int exp, int ismaster, int *level, int *skclass){
     if(ismaster){
         for(int i = TOTAL_LEVEL -1; i > 0; i--){
@@ -68,11 +86,15 @@ void formatOutput(int skclass, int sklevel, int afterclass, int afterlevel, int 
         printf("Free: \nFrom ");
     if(skclass == 0) {
         printf("Major class %3d\n", sklevel);
-        printf("To   Major class %3d, Exp lost = %d\n", afterlevel, currentExp - afterExp);
+        printf("To   Major class %3d, Exp lost = ", afterlevel);
+		printfGroupThousand(currentExp - afterExp);
+		printf("\n");
     }
     else {
         printf("Perk/Skill %d, %3d%%\n", skclass, sklevel);
-        printf("To   Perk/Skill %d, %3d%%, Exp lost = %d\n", afterclass, afterlevel, currentExp - afterExp);
+        printf("To   Perk/Skill %d, %3d%%, Exp lost = ", afterclass, afterlevel);
+		printfGroupThousand(currentExp - afterExp);
+		printf("\n");
     }
 }
 
@@ -99,7 +121,9 @@ void showNextStep(int skclass, int sklevel, int currentExp) {
     else {
         printf("Exp to next level unknown!\n");
     }
-    printf("To next level, you need %d exp.\n", toNextLevel);
+    printf("To next level, you need ");
+	printfGroupThousand(toNextLevel);
+	printf(" exp.\n");
 }
 
 void showTargetStep(int skclass, int sklevel, int currentExp, int targetclass, int targetlevel) {
@@ -124,10 +148,16 @@ void showTargetStep(int skclass, int sklevel, int currentExp, int targetclass, i
         }
         requiredExp += sk[targetclass-1][targetlevel] - currentExp;
     }
-    if(targetclass == 0)
-        printf("To Master %d%%, you need %d exp.\n", targetlevel, requiredExp);
-    else
-        printf("To %d skill %d%%, you need %d exp.\n", targetclass, targetlevel, requiredExp);
+    if(targetclass == 0){
+        printf("To Master %d%%, you need ", targetlevel);
+		printfGroupThousand(requiredExp);
+		printf(" exp.\n");
+	}
+    else {
+        printf("To %d skill %d%%, you need ", targetclass, targetlevel);
+		printfGroupThousand(requiredExp);
+		printf(" exp.\n");
+	}
 
 }
 int max(int a, int b){
@@ -192,7 +222,9 @@ int main(int argc, char ** argv){
 
     generateList();
     currentExp = getExp(skillclass, skilllevel);
-    printf("Current exp %d\n", currentExp);
+    printf("Current exp ");
+	printfGroupThousand(currentExp);
+	printf("\n");
     showNextStep(skillclass, skilllevel, currentExp);
     if(skillclass == 0) {
         showRetrainMaster(skillclass, skilllevel, currentExp, 1);
