@@ -2,8 +2,7 @@ all: main.c
 	g++ main.c -o wotexp -Wall
 
 test:
-	./wotexp 3 50 3 55
-	./wotexp 0 100
+	./wotexp 3 53 3 55
 
 clean:
 	rm *.o wotexp *~
