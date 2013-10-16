@@ -2,7 +2,8 @@ This program is World of Tanks crew experience calculator.
 It will calculate required experience for specific master/skill/perk level to another.
 
 Usage: 
-    ./wotexp [skill class] [skill level] [[target skill class] [target skill level]]
+
+    $./wotexp [skill class] [skill level] [[target skill class] [target skill level]]
 
     Skill class:
     0 means tank mastery.
