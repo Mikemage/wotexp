@@ -251,16 +251,17 @@ int main(int argc, char ** argv){
     printf("Current exp ");
     printfGroupThousand(currentExp);
     printf("\n");
-    showNextStep(skillclass, skilllevel, currentExp);
-    printf("============\n");
-    showRetrain(skillclass, skilllevel, currentExp);
-    printf("============\n");
     if(hasTarget){
         showTargetStep(skillclass, skilllevel, currentExp, targetclass, targetlevel);
         if(targetclass == 1 && targetlevel == 0)
             return 0;
         printf("============\n");
         showRetrain(targetclass, targetlevel, getExp(targetclass, targetlevel));
+    }
+    else {
+        showNextStep(skillclass, skilllevel, currentExp);
+        printf("============\n");
+        showRetrain(skillclass, skilllevel, currentExp);
     }
     return 0;
 }
