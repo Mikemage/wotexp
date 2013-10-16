@@ -12,6 +12,7 @@ Usage:
     % of skill class progress.
 
 Example:
+
     If I want to know the experience need to have my crew tank mastery from 91% to 100%.
     $./wotexp 0 91 0 100
 
