@@ -50,9 +50,9 @@ The program will show you the retrain result.
     From Perk/Skill 3,  53%
     To   Perk/Skill 3,  23%, Exp lost = 71,927, Residual Exp = 1,057
     To next level, you need 97 exp.
-    ============
 
 
 Known issue:
-    All mathmatic calculation for each skill level isn't identical to in game setting.
+
+    All mathmetic calculation for each skill level isn't identical to in game setting.
     There will be error accumulated to higher skill class
