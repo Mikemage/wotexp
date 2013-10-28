@@ -3,7 +3,7 @@ It will calculate required experience for specific master/skill/perk level to an
 
 Usage: 
 
-    $./wotexp [skill class] [skill level] [[target skill class] [target skill level]]
+    $./wotexp [skill class] [skill level] [[experience] | [target skill class] [target skill level]]
 
     Skill class:
     0 means tank mastery.
@@ -50,6 +50,18 @@ The program will show you the retrain result.
     From Perk/Skill 3,  53%
     To   Perk/Skill 3,  23%, Exp lost = 71,927, Residual Exp = 1,057
     To next level, you need 97 exp.
+
+You can also calculate the expected level with specific amount of exp.
+
+    If I want to know with 10,000 exp will up level your crew to which level.
+    $./wotexp 1 10 10000
+
+    Program result:
+
+    Current exp 1,245.
+    With 10,000 exp, you can upgrade to 1,  39%, 563 exp left.
+    To next level, you need 40 exp.
+
 
 
 Known issue:
