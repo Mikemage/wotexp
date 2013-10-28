@@ -79,6 +79,32 @@ int getExp(int skclass, int level) {
     return rtn;
 }
 
+int getNextLevel(int skclass, int sklevel){
+    int toNextLevel = 0;
+    if(skclass == 0) {
+        if(sklevel == 100)
+            toNextLevel = sk[0][1];
+        else
+            toNextLevel = mainsk[sklevel+1] - mainsk[sklevel];
+    }
+    else if(skclass < 6){
+        if(sklevel == 100){
+            if(skclass < 4){
+                toNextLevel = sk[skclass][1] - sk[skclass][0];
+            }
+            else{
+                printf("Exp to next level unknown!\n");
+            }
+        }
+        else
+            toNextLevel = sk[skclass-1][sklevel+1] - sk[skclass-1][sklevel];
+    }
+    else {
+        printf("Exp to next level unknown!\n");
+    }
+    return(toNextLevel);
+
+}
 
 void showNextStep(int skclass, int sklevel, int currentExp) {
     int toNextLevel = 0;
@@ -114,20 +140,20 @@ void formatOutput(int skclass, int sklevel, int afterclass, int afterlevel, int 
     else
         printf("Free: \nFrom ");
     if(skclass == 0) {
-        printf("Major class %3d\n", sklevel);
-        printf("To   Major class %3d, Exp lost = ", afterlevel);
+        printf("Major class %3d.\n", sklevel);
+        printf("To   Major class %3d. Exp lost = ", afterlevel);
         printfGroupThousand(currentExp - afterExp);
-        printf(", Residual Exp = ");
+        printf(". Residual Exp = ");
         printfGroupThousand(afterExp - getExp(afterclass, afterlevel));
-        printf("\n");
+        printf(".\n");
     }
     else {
-        printf("Perk/Skill %d, %3d%%\n", skclass, sklevel);
-        printf("To   Perk/Skill %d, %3d%%, Exp lost = ", afterclass, afterlevel);
+        printf("Perk/Skill %d, %3d%%.\n", skclass, sklevel);
+        printf("To   Perk/Skill %d, %3d%%. Exp lost = ", afterclass, afterlevel);
         printfGroupThousand(currentExp - afterExp);
-        printf(", Residual Exp = ");
+        printf(". Residual Exp = ");
         printfGroupThousand(afterExp - getExp(afterclass, afterlevel));
-        printf("\n");
+        printf(".\n");
     }
     showNextStep(afterclass, afterlevel, afterExp);
 }
@@ -159,7 +185,7 @@ void showTargetStep(int skclass, int sklevel, int currentExp, int targetclass, i
         printf(" exp.\n");
     }
     else {
-        printf("To %d skill %d%%, you need ", targetclass, targetlevel);
+        printf("To %d skill %3d%%, you need ", targetclass, targetlevel);
         printfGroupThousand(requiredExp);
         printf(" exp.\n");
     }
@@ -218,6 +244,33 @@ void showRetrain(int skclass, int sklevel, int currentExp) {
     }
 }
 
+void showAddExpResult(int skclass, int sklevel, int addExp) {
+    int toNext = 0;
+    int expLeft = addExp;
+    do{
+        toNext = getNextLevel(skclass, sklevel);
+        if(toNext > expLeft){
+            printf("With ");
+            printfGroupThousand(addExp);
+            printf(" exp, you can upgrade to %d, %3d%%, ", skclass, sklevel);
+            printfGroupThousand(expLeft);
+            printf(" exp left.\n");
+            showNextStep(skclass, sklevel, getExp(skclass, sklevel)+expLeft);
+            break;
+        }
+        else {
+            expLeft -= toNext;
+            if(sklevel == 100){
+                skclass++;
+                sklevel = 1;
+            }
+            else{
+                sklevel++;
+            }
+        }
+    }while(addExp > 0);
+    
+}
 int main(int argc, char ** argv){
     int skillclass = 0;
     int skilllevel = 0;
@@ -225,6 +278,8 @@ int main(int argc, char ** argv){
     int targetclass = 0;
     int targetlevel = 0;
     int hasTarget = 0;
+    int hasExp = 0;
+    int addExp = 0;
     if(argc < 3) {
         usage();
         return 0;
@@ -238,6 +293,11 @@ int main(int argc, char ** argv){
         usage();
         return 0;
     }
+    if(argc == 4) {
+        if(sscanf(argv[3], "%d", &addExp)){
+            hasExp = 1;
+        }
+    }
     if(argc == 5) {
         if(sscanf(argv[3], "%d", &targetclass) && 
            sscanf(argv[4], "%d", &targetlevel)) {
@@ -250,8 +310,11 @@ int main(int argc, char ** argv){
     currentExp = getExp(skillclass, skilllevel);
     printf("Current exp ");
     printfGroupThousand(currentExp);
-    printf("\n");
-    if(hasTarget){
+    printf(".\n");
+    if(hasExp){
+        showAddExpResult(skillclass, skilllevel, addExp);
+    }
+    else if(hasTarget){
         showTargetStep(skillclass, skilllevel, currentExp, targetclass, targetlevel);
         if(targetclass == 1 && targetlevel == 0)
             return 0;
